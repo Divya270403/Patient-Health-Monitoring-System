@@ -1,0 +1,70 @@
+// include the library code:
+#include <LiquidCrystal.h>
+int tempPin=A0; // A0 for TMP36
+int heartbeat=7; //Vital sign sensing
+int buzzer=8; //for buzzer pin 8 
+int red=9; // for red LED pin 9
+int green=10;//for green LED pin 10
+int vitalsign=0; //vital sign variable
+int T=0;//T for storing Temperature value
+
+// initialize the library with 
+//the numbers of the interface pins
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+void setup() {
+  Serial.begin(9600);
+  // set up the LCD's number of columns and rows:
+  lcd.begin(16, 2); 
+  pinMode(tempPin,INPUT); //TMP36 as input
+  pinMode(heartbeat,INPUT);//vital sign as input
+  pinMode(buzzer,OUTPUT); //buzzer as output
+  pinMode(red,OUTPUT);//red led as output
+  pinMode(green,OUTPUT);//green led as output 
+}
+
+void loop() {
+vitalsign=digitalRead(heartbeat); //read data
+  //scenario 1
+if (vitalsign==HIGH) //condition
+{
+  lcd.setCursor(0, 0);
+  lcd.print("PERSON ALIVE");
+  digitalWrite(green,HIGH);//on green LED
+  digitalWrite(red,LOW);//on red LED
+  digitalWrite(buzzer,LOW);//on Buzzer
+}
+    //scenario 2
+  else if (vitalsign==LOW)
+{
+  lcd.setCursor(0, 0);
+  lcd.print("PERSON  DEAD");
+  digitalWrite(green,LOW);
+  digitalWrite(red,HIGH);
+  digitalWrite(buzzer,HIGH);
+  delay(500);
+}
+  T= analogRead(tempPin)/2;
+  lcd.setCursor(0, 1);
+  lcd.print("T=");
+  lcd.setCursor(3, 1);
+  lcd.print(T);
+  lcd.setCursor(6, 1);
+  lcd.print("F");
+    //scenario 3
+  if(T<99)
+  {
+  lcd.setCursor(8, 1);
+  lcd.print("Normal");
+  digitalWrite(buzzer,LOW);
+  }
+    //scenario 4
+  else   if(T>=99)
+  {
+  lcd.setCursor(8, 1);
+  lcd.print("Critical");
+  digitalWrite(buzzer,HIGH);
+  }
+  delay(1000);
+}
+ 
